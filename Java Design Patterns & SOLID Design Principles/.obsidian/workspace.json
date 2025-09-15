@@ -1,0 +1,205 @@
+{
+  "main": {
+    "id": "792be06f05f27b86",
+    "type": "split",
+    "children": [
+      {
+        "id": "9f93ea1720d911f7",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "a2e19d1f4d4ea811",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "1. SOLID Design Principles/1-2 Single Responsibility Principle.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "1-2 Single Responsibility Principle"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "9460c21a409a6893",
+    "type": "split",
+    "children": [
+      {
+        "id": "72638e0b3420752e",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "03d3f45f3d6cb550",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "0d68eca8a4e4ad32",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "63f41d257784ea36",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "868f65a56b5f5177",
+    "type": "split",
+    "children": [
+      {
+        "id": "7e6408448e5f72e2",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "b93e395da16a2710",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "28. Strategy/28-3 Implementation.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for 28-3 Implementation"
+            }
+          },
+          {
+            "id": "c661d62f281cf6c1",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "28. Strategy/28-3 Implementation.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from 28-3 Implementation"
+            }
+          },
+          {
+            "id": "70c6dc03d95113ec",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "39b8918a25a09d3d",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "28. Strategy/28-3 Implementation.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of 28-3 Implementation"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "a2e19d1f4d4ea811",
+  "lastOpenFiles": [
+    "1. SOLID Design Principles/1-1 Section Introduction.md",
+    "28. Strategy/28-8 Summary.md",
+    "28. Strategy/28-7 Pitfalls.md",
+    "28. Strategy/28-6 Comparison with State.md",
+    "28. Strategy/28-5 Example.md",
+    "28. Strategy/28-4 Implementation & Design Considerations.md",
+    "28. Strategy/28-3 Implementation.md",
+    "28. Strategy/Strategy_demo/Untitled.md",
+    "28. Strategy/Strategy_demo/strategy/target/classes/com/strategy_demo/User.class",
+    "28. Strategy/Strategy_demo/strategy/target/classes/com/strategy_demo/SummaryPrinter.class",
+    "28. Strategy/Strategy_demo/strategy/target/classes/com/strategy_demo/PrintService.class",
+    "28. Strategy/Strategy_demo/strategy/target/classes/com/strategy_demo/OrderPrinter.class",
+    "28. Strategy/Strategy_demo/strategy/target/classes/com/strategy_demo/Order.class",
+    "28. Strategy/Strategy_demo/strategy/target/classes/com/strategy_demo/Client.class",
+    "28. Strategy/Strategy_demo/strategy/src/main/java/com/strategy_demo/User.java",
+    "28. Strategy/Strategy_demo/strategy/src/main/java/com/strategy_demo/SummaryPrinter.java",
+    "28. Strategy/Strategy_demo/strategy/src/main/java/com/strategy_demo/PrintService.java",
+    "28. Strategy/Strategy_demo/strategy/src/main/java/com/strategy_demo/OrderPrinter.java",
+    "28. Strategy/28-2 Implementation Steps.md",
+    "28. Strategy/28-1 Strategy - Introduction.md",
+    "1. SOLID Design Principles/1-11 Dependency Inversion Principle - Hands On.md",
+    "1. SOLID Design Principles/1-10 Dependency Inversion Principle.md",
+    "1. SOLID Design Principles/1-9 Interface Segregation Principle - Hands On.md",
+    "1. SOLID Design Principles/1-8 Interface Segregation Principle.md",
+    "1. SOLID Design Principles/1-7 Liskov Substitution Principle - Hands On.md",
+    "1. SOLID Design Principles/1-6 Liskov Substitution Principle.md",
+    "1. SOLID Design Principles/1-5 Open-Closed Principle - Hands On.md",
+    "1. SOLID Design Principles/1-4 Open-Closed Principle.md",
+    "1. SOLID Design Principles/1-3 Single Responsibility Principle - Hands on.md",
+    "1. SOLID Design Principles/1-2 Single Responsibility Principle.md"
+  ]
+}

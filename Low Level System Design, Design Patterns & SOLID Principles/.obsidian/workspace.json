@@ -1,0 +1,177 @@
+{
+  "main": {
+    "id": "cdd60039be0b11e0",
+    "type": "split",
+    "children": [
+      {
+        "id": "40f9d13837672a78",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "ce08968c1fb098b0",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "7. Strategy Pattern/7-2 Strategy Pattern - Solution.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "7-2 Strategy Pattern - Solution"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "8723cc1545258ebe",
+    "type": "split",
+    "children": [
+      {
+        "id": "3319671eed55e944",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "3363fed7c517a2dd",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "035c9ca3bd76a85a",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "29d8494adb7ac4dd",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "a5c16c59b08c8f5f",
+    "type": "split",
+    "children": [
+      {
+        "id": "9db9145e1e288599",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "cce8d20fe8d7449f",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "7. Strategy Pattern/7-2 Strategy Pattern - Solution.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for 7-2 Strategy Pattern - Solution"
+            }
+          },
+          {
+            "id": "76bf770dd56c34a5",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "7. Strategy Pattern/7-2 Strategy Pattern - Solution.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from 7-2 Strategy Pattern - Solution"
+            }
+          },
+          {
+            "id": "9421605589f12799",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "900cdf53dfbe48c9",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "7. Strategy Pattern/7-2 Strategy Pattern - Solution.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of 7-2 Strategy Pattern - Solution"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "ce08968c1fb098b0",
+  "lastOpenFiles": [
+    "7. Strategy Pattern/7-1 Strategy Pattern - Problem Statement.md",
+    "7. Strategy Pattern/7-2 Strategy Pattern - Solution.md"
+  ]
+}
