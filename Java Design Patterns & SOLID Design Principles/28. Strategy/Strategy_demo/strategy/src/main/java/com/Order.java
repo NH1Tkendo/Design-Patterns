@@ -1,4 +1,4 @@
-package com.strategy_demo;
+package com;
 
 import java.time.LocalDate;
 import java.util.HashMap;

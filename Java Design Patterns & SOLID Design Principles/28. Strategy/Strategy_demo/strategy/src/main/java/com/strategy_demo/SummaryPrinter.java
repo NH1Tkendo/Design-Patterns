@@ -3,6 +3,9 @@ package com.strategy_demo;
 import java.util.Collection;
 import java.util.Iterator;
 
+import com.Order;
+import com.OrderPrinter;
+
 //Concrete strategy
 public class SummaryPrinter implements OrderPrinter {
 

@@ -1,4 +1,4 @@
-package com.strategy_demo;
+package com;
 
 import java.util.Collection;
 
