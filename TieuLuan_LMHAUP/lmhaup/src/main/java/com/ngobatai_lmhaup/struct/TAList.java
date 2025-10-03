@@ -6,7 +6,7 @@ import java.util.List;
 public class TAList {
     public final int[] itemset;
     public final int len;
-    public final List<TAListEntry> entries = new ArrayList<>(); // sorted by tid
+    public final List<TAListEntry> entries = new ArrayList<>();
 
     public TAList(int[] itemset) {
         this.itemset = itemset;
