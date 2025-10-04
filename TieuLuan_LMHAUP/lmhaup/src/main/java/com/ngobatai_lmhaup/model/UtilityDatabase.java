@@ -21,11 +21,14 @@ public class UtilityDatabase {
     public int[] itemOrder;
     // Duyệt theo thứ tự đã sắp khi dựng TA-List 1-mục
     public int[] orderToItem;
+
+    // ===================================================================
+
     // =======================Thống kê toàn cục==============================
     // Lưu trữ U(DB) dùng để tính minutil
     public double totalUtilityDB;
     // Đếm số support để sắp như bảng 4 trong bài báo
-    public Map<Integer, Integer> support;
+    public Map<Integer, Integer> support = new HashMap<>();
 
     // Thêm vào item profit table - def1
     public void addItemDef(Item it) {
