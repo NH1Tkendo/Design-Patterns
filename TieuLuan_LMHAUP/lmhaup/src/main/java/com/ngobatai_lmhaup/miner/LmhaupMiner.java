@@ -32,7 +32,7 @@ public class LmhaupMiner {
     }
 
     public void mine() {
-        System.out.print(minutil);
+        System.out.println("minutil: " + minutil);
         // 1) First scan: compute tmaub and support to define promising 1-items and
         // global order
         TMAUBCaculator.TmaubStats st = tmaubCalc.compute(db);

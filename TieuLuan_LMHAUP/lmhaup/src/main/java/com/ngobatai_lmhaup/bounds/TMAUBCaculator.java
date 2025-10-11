@@ -58,6 +58,7 @@ public class TMAUBCaculator {
                     }
                 }
                 // Xác định và lưu trữ giá trị TMAUB cho từng Transaction
+                best = Math.round(best * 100.0) / 100.0;
                 st.tmaubPerItem.merge(ti.itemId, best, Double::sum);
             }
         }
