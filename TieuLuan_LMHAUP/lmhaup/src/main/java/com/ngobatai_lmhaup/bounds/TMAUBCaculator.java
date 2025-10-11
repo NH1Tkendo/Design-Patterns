@@ -1,5 +1,7 @@
 package com.ngobatai_lmhaup.bounds;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -58,10 +60,17 @@ public class TMAUBCaculator {
                     }
                 }
                 // Xác định và lưu trữ giá trị TMAUB cho từng Transaction
-                best = Math.round(best * 100.0) / 100.0;
                 st.tmaubPerItem.merge(ti.itemId, best, Double::sum);
             }
         }
+        // Sau khi hoàn thành tất cả các transaction
+        for (Map.Entry<Integer, Double> entry : st.tmaubPerItem.entrySet()) {
+            double value = entry.getValue();
+            BigDecimal bd = new BigDecimal(Double.toString(value));
+            double rounded = bd.setScale(2, RoundingMode.HALF_UP).doubleValue();
+            st.tmaubPerItem.put(entry.getKey(), rounded);
+        }
+
         System.out.print(st.tmaubPerItem);
         return st;
     }

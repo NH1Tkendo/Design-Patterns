@@ -36,30 +36,34 @@ public class LmhaupMiner {
         // 1) First scan: compute tmaub and support to define promising 1-items and
         // global order
         TMAUBCaculator.TmaubStats st = tmaubCalc.compute(db);
-        // // choose promising items
-        // Set<Integer> promising = st.tmaubPerItem.entrySet().stream()
-        // .filter(e -> e.getValue() >= minutil)
-        // .map(Map.Entry::getKey)
-        // .collect(Collectors.toCollection(LinkedHashSet::new));
-        // // build global order by ascending support
-        // List<Integer> orderList = promising.stream()
-        // .sorted(Comparator.comparingInt(i -> st.support.getOrDefault(i, 0)))
-        // .collect(Collectors.toList());
-        // int[] order = new int[1 + db.items.keySet().stream().mapToInt(i ->
-        // i).max().orElse(0)];
-        // int[] rev = new int[orderList.size()];
-        // for (int r = 0; r < orderList.size(); r++) {
-        // int item = orderList.get(r);
-        // order[item] = r;
-        // rev[r] = item;
-        // }
-        // db.itemOrder = order;
-        // db.orderToItem = rev;
+        // choose promising items
+        Set<Integer> promising = st.tmaubPerItem.entrySet().stream()
+                .filter(e -> e.getValue() >= minutil)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+
+        // build global order by ascending support
+        List<Integer> orderList = promising.stream()
+                .sorted(Comparator.comparingInt(i -> st.support.getOrDefault(i, 0)))
+                .collect(Collectors.toList());
+
+        System.out.println(orderList);
+        int[] order = new int[1 + db.items.keySet().stream().mapToInt(i -> i).max().orElse(0)];
+
+        int[] rev = new int[orderList.size()];
+        for (int r = 0; r < orderList.size(); r++) {
+            int item = orderList.get(r);
+            order[item] = r;
+            rev[r] = item;
+        }
+        db.itemOrder = order;
+        db.orderToItem = rev;
 
         // // 2) Second scan: build TA-List 1-item
-        // TAListFactory factory = new TAListFactory(db, promising, order);
-        // Map<Integer, TAList> oneLists = factory.TAList1Item();
+        TAListFactory factory = new TAListFactory(db, promising, order);
+        Map<Integer, TAList> oneLists = factory.TAList1Item();
 
+        System.out.print(oneLists);
         // // 3) Filter 1-items by mrau to start DFS
         // List<TAList> seeds = new ArrayList<>();
         // for (int item : orderList) {
