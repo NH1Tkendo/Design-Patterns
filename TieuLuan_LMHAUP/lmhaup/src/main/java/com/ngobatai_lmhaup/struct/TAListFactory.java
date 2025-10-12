@@ -16,9 +16,9 @@ public class TAListFactory {
     private Set<Integer> promisingItems;
     private int[] order;
 
-    public TAListFactory(UtilityDatabase udb, Set<Integer> set, int[] order) {
-        udb = utilityDatabase;
-        set = promisingItems;
+    public TAListFactory(UtilityDatabase utilityDatabase, Set<Integer> promisingItems, int[] order) {
+        this.utilityDatabase = utilityDatabase;
+        this.promisingItems = promisingItems;
         this.order = order;
     }
 
