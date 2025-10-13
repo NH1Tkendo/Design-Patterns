@@ -81,16 +81,16 @@ public class LmhaupMiner {
             System.out.println("+---------+----------+----------+--------+");
         }
 
-        // // 3) Filter 1-items by mrau to start DFS
-        // List<TAList> seeds = new ArrayList<>();
-        // for (int item : orderList) {
-        // TAList L = oneLists.get(item);
-        // if (L == null)
-        // continue;
-        // double mrau = mrauCalc.mrauOf(L);
-        // if (mrau >= minutil)
-        // seeds.add(L);
-        // }
+        // 3) Filter các TA-List 1 item dựa trên MRAU
+        List<TAList> seeds = new ArrayList<>();
+        for (int item : orderList) {
+            TAList L = oneLists.get(item);
+            if (L == null)
+                continue;
+            double mrau = mrauCalc.mrauOf(L);
+            if (mrau >= minutil)
+                seeds.add(L);
+        }
 
         // // 4) DFS TA-Miner
         // for (int i = 0; i < seeds.size(); i++) {
