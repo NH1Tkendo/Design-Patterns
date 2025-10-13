@@ -70,7 +70,7 @@ public class Main {
 				new TransactionItem(6, 2, db))));
 
 		System.out.println("Item profit table" + "\n" + db.items);
-		double delta = 0.06;
+		double delta = 0.17;
 		LmhaupMiner miner = new LmhaupMiner(db, delta);
 		miner.mine();
 
