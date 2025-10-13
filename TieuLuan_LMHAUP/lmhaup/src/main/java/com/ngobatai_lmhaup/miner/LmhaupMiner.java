@@ -92,28 +92,28 @@ public class LmhaupMiner {
                 seeds.add(L);
         }
 
-        // // 4) DFS TA-Miner
-        // for (int i = 0; i < seeds.size(); i++) {
-        // TAList prefix = seeds.get(i);
-        // // output if au >= minutil
-        // double au = mrauCalc.auOf(prefix);
-        // if (au >= minutil) {
-        // haupItemsets.add(prefix.itemset);
-        // haupAU.add(au);
-        // }
-        // // extend with following seeds by order
-        // List<TAList> suffixes = new ArrayList<>();
-        // for (int j = i + 1; j < seeds.size(); j++) {
-        // TAList next = seeds.get(j);
-        // TAList joined = joiner.join(prefix, next, 0);
-        // double mrau = mrauCalc.mrauOf(joined);
-        // if (mrau >= minutil)
-        // suffixes.add(joined);
-        // // else pruned
-        // }
-        // // recursive mining
-        // taMiner(prefix, suffixes);
-        // }
+        // 4) DFS TA-Miner
+        for (int i = 0; i < seeds.size(); i++) {
+            TAList prefix = seeds.get(i);
+            // output if au >= minutil
+            double au = mrauCalc.auOf(prefix);
+            if (au >= minutil) {
+                haupItemsets.add(prefix.itemset);
+                haupAU.add(au);
+            }
+            // extend with following seeds by order
+            List<TAList> suffixes = new ArrayList<>();
+            for (int j = i + 1; j < seeds.size(); j++) {
+                TAList next = seeds.get(j);
+                TAList joined = joiner.join(prefix, next, 0);
+                double mrau = mrauCalc.mrauOf(joined);
+                if (mrau >= minutil)
+                    suffixes.add(joined);
+                // else pruned
+            }
+            // recursive mining
+            taMiner(prefix, suffixes);
+        }
     }
 
     private void taMiner(TAList prefix, List<TAList> exts) {

@@ -14,7 +14,7 @@ public class MRAUCalculator {
             } else if (e.sRLU != 0.0) {
                 s += (e.util + e.sRLU) / (len + 1.0);
             } else {
-                // add zero
+                s += 0;
             }
         }
         return s;
