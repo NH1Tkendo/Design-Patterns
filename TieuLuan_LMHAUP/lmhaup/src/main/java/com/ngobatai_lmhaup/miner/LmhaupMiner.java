@@ -12,6 +12,7 @@ import com.ngobatai_lmhaup.bounds.MRAUCalculator;
 import com.ngobatai_lmhaup.bounds.TMAUBCaculator;
 import com.ngobatai_lmhaup.model.UtilityDatabase;
 import com.ngobatai_lmhaup.struct.TAList;
+import com.ngobatai_lmhaup.struct.TAListEntry;
 import com.ngobatai_lmhaup.struct.TAListFactory;
 
 public class LmhaupMiner {
@@ -59,11 +60,27 @@ public class LmhaupMiner {
         db.itemOrder = order;
         db.orderToItem = rev;
 
-        // // 2) Second scan: build TA-List 1-item
+        // 2. Lượt quét thứ 2, xây dựng các TA-List 1 item
         TAListFactory factory = new TAListFactory(db, promising, order);
         Map<Integer, TAList> oneLists = factory.TAList1Item();
 
-        System.out.print(oneLists);
+        System.out.println("========== TA-LISTS FOR 1-ITEMS ==========");
+        for (Map.Entry<Integer, TAList> entry : oneLists.entrySet()) {
+            int itemId = entry.getKey();
+            TAList taList = entry.getValue();
+
+            System.out.println("\n--- Item " + itemId + " ---");
+            System.out.println("+---------+----------+----------+--------+");
+            System.out.println("|   TID   |   util   |   sRLU   | nRLUI  |");
+            System.out.println("+---------+----------+----------+--------+");
+
+            for (TAListEntry e : taList.entries) {
+                System.out.printf("| %7d | %8.2f | %8.2f | %6d |%n",
+                        e.tid, e.util, e.sRLU, e.nRLUI);
+            }
+            System.out.println("+---------+----------+----------+--------+");
+        }
+
         // // 3) Filter 1-items by mrau to start DFS
         // List<TAList> seeds = new ArrayList<>();
         // for (int item : orderList) {
