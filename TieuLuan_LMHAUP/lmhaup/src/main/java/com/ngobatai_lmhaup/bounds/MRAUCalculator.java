@@ -10,12 +10,13 @@ public class MRAUCalculator {
         int len = list.len;
         for (TAListEntry e : list.entries) {
             if (e.nRLUI != 0) {
+                // Case 1: nRLUI != 0
                 s += (e.util + e.sRLU) / (len + e.nRLUI);
             } else if (e.sRLU != 0.0) {
+                // Case 2: nRLUI = 0 but sRLU != 0
                 s += (e.util + e.sRLU) / (len + 1.0);
-            } else {
-                s += 0;
             }
+            // Case 3: nRLUI = 0 and sRLU = 0 -> mrau = 0, không cần cộng gì
         }
         return s;
     }

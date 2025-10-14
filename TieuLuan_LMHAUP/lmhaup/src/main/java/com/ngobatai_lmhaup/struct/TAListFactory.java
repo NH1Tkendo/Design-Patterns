@@ -58,22 +58,16 @@ public class TAListFactory {
                 double sRLU = 0.0;
                 int nRLUI = 0;
                 double uP = cur.util;
-                double b_prev = uP / 1.0; // b₀
+                int lenP = 1; // Length của pattern hiện tại (1-item)
+                double b_prev = uP / lenP; // b₀ = au(P,T)
 
                 for (TransactionItem cand : TR) {
-                    // Tính b_n nếu thêm cand vào S(P,T)
                     double b_n = (uP + sRLU + cand.util) / (1.0 + nRLUI + 1);
 
-                    // Kiểm tra 2 điều kiện:
-                    // 1. u(i'_n, T) >= b_{n-1}
-                    // 2. b_n >= b_{n-1}
                     if (cand.util >= b_prev && b_n >= b_prev) {
                         sRLU += cand.util;
                         nRLUI += 1;
                         b_prev = b_n;
-                    } else {
-                        // Dừng ngay khi không thỏa điều kiện
-                        break;
                     }
                 }
 

@@ -71,7 +71,31 @@ public class TMAUBCaculator {
             st.tmaubPerItem.put(entry.getKey(), rounded);
         }
 
-        System.out.print(st.tmaubPerItem);
+        printTmaubTable(st.tmaubPerItem, st.support);
         return st;
+    }
+
+    private void printTmaubTable(Map<Integer, Double> tmaubPerItem, Map<Integer, Integer> support) {
+        // Tiêu đề bảng
+        System.out.println("\n╔════════════════════════════════════════════╗");
+        System.out.println("║        TMAUB PER ITEM STATISTICS           ║");
+        System.out.println("╠═══════════╦════════════════╦═══════════════╣");
+        System.out.printf("║ %-9s ║ %-14s ║ %-13s ║%n", "Item ID", "TMAUB Value", "Support");
+        System.out.println("╠═══════════╬════════════════╬═══════════════╣");
+
+        // Sắp xếp theo Item ID
+        List<Integer> sortedKeys = new ArrayList<>(tmaubPerItem.keySet());
+        sortedKeys.sort(Integer::compareTo);
+
+        // In từng dòng dữ liệu
+        for (Integer itemId : sortedKeys) {
+            Double tmaubValue = tmaubPerItem.get(itemId);
+            Integer supportValue = support.getOrDefault(itemId, 0);
+            System.out.printf("║ %-9d ║ %-14.2f ║ %-13d ║%n",
+                    itemId, tmaubValue, supportValue);
+        }
+
+        // Dòng cuối bảng
+        System.out.println("╚═══════════╩════════════════╩═══════════════╝");
     }
 }

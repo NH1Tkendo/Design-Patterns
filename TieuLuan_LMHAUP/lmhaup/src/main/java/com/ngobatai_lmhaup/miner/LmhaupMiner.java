@@ -1,141 +1,182 @@
 package com.ngobatai_lmhaup.miner;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.ngobatai_lmhaup.bounds.MRAUCalculator;
 import com.ngobatai_lmhaup.bounds.TMAUBCaculator;
 import com.ngobatai_lmhaup.model.UtilityDatabase;
 import com.ngobatai_lmhaup.struct.TAList;
-import com.ngobatai_lmhaup.struct.TAListEntry;
 import com.ngobatai_lmhaup.struct.TAListFactory;
+import com.ngobatai_lmhaup.util.MemoryMonitor;
 
 public class LmhaupMiner {
 
+    // Giới hạn kết quả đầu ra
+    private static final int MAX_CACHE_SIZE = 5000;
+    private static final int MAX_DEPTH = 8;
+    private static final int MAX_PATTERNS_PER_LEVEL = 2000;
+    private static final int MAX_HAUPS = 10000;
+
+    // Các thành phần cốt lõi
     private final UtilityDatabase db;
-    private final double minutil; // = U(DB) * delta
+    private final double minutil;
     private final TMAUBCaculator tmaubCalc = new TMAUBCaculator();
     private final MRAUCalculator mrauCalc = new MRAUCalculator();
     private final Joiner joiner = new Joiner();
 
-    // Kết quả
-    public final List<int[]> haupItemsets = new ArrayList<>();
-    public final List<Double> haupAU = new ArrayList<>();
+    // Các lớp helper
+    private final CacheManager cacheManager;
+    private final HAUPChecker haupChecker;
+    private final MiningStatistics statistics;
+    private final ItemOrderBuilder orderBuilder;
+    private final PatternGenerator patternGenerator;
+
+    // Lưu trữ các haup
+    public final List<int[]> haupItemsets;
+    public final List<Double> haupAU;
 
     public LmhaupMiner(UtilityDatabase db, double delta) {
+        // 1. Gán db và minutil
         this.db = db;
-        this.minutil = db.totalUtilityDB * delta;
+        double number = db.totalUtilityDB * delta;
+        this.minutil = Math.round(number * 100.0) / 100.0;
+
+        // 2. Khởi tạo các lớp helper
+        this.cacheManager = new CacheManager(MAX_CACHE_SIZE);
+        this.haupChecker = new HAUPChecker(minutil, MAX_HAUPS);
+        this.statistics = new MiningStatistics();
+        this.orderBuilder = new ItemOrderBuilder(db, minutil);
+        this.patternGenerator = new PatternGenerator(joiner, cacheManager, null); // itemOrder will be set later
+
+        joiner.setUtilityCache(cacheManager.getCache());
+
+        this.haupItemsets = haupChecker.getHAUPItemsets();
+        this.haupAU = haupChecker.getHAUPAU();
+    }
+
+    public LmhaupMiner(UtilityDatabase db, double minutil, boolean isAbsolute) {
+        this.db = db;
+        if (isAbsolute) {
+            this.minutil = minutil;
+        } else {
+            double number = db.totalUtilityDB * minutil;
+            this.minutil = Math.round(number * 100.0) / 100.0;
+        }
+
+        // Khởi tạo lớp helper
+        this.cacheManager = new CacheManager(MAX_CACHE_SIZE);
+        this.haupChecker = new HAUPChecker(this.minutil, MAX_HAUPS);
+        this.statistics = new MiningStatistics();
+        this.orderBuilder = new ItemOrderBuilder(db, this.minutil);
+        this.patternGenerator = new PatternGenerator(joiner, cacheManager, null); // itemOrder will be set later
+
+        joiner.setUtilityCache(cacheManager.getCache());
+
+        this.haupItemsets = haupChecker.getHAUPItemsets();
+        this.haupAU = haupChecker.getHAUPAU();
     }
 
     public void mine() {
-        System.out.println("minutil: " + minutil);
-        // 1) First scan: compute tmaub and support to define promising 1-items and
-        // global order
+        printMiningConfig();
+        MemoryMonitor.printMemoryUsage("Start");
+
+        // 1) Tính TMAUB và lọc ra các promising item
         TMAUBCaculator.TmaubStats st = tmaubCalc.compute(db);
-        // choose promising items
-        Set<Integer> promising = st.tmaubPerItem.entrySet().stream()
-                .filter(e -> e.getValue() >= minutil)
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toCollection(LinkedHashSet::new));
+        Set<Integer> promising = orderBuilder.filterPromisingItems(st);
+        List<Integer> orderList = orderBuilder.buildOrder(st, promising);
 
-        // build global order by ascending support
-        List<Integer> orderList = promising.stream()
-                .sorted(Comparator.comparingInt(i -> st.support.getOrDefault(i, 0)))
-                .collect(Collectors.toList());
+        // Set item order for pattern generator after it's been built
+        patternGenerator.setItemOrder(db.itemOrder);
 
-        System.out.println(orderList);
-        int[] order = new int[1 + db.items.keySet().stream().mapToInt(i -> i).max().orElse(0)];
+        // 2) Xây dựng các TA-List với 1 item
+        TAListFactory factory = new TAListFactory(db, promising, db.itemOrder);
+        TAListBuilder taListBuilder = new TAListBuilder(factory, mrauCalc, cacheManager, haupChecker);
 
-        int[] rev = new int[orderList.size()];
-        for (int r = 0; r < orderList.size(); r++) {
-            int item = orderList.get(r);
-            order[item] = r;
-            rev[r] = item;
-        }
-        db.itemOrder = order;
-        db.orderToItem = rev;
+        Map<Integer, TAList> oneLists = taListBuilder.buildOneItemTALists();
+        List<TAList> seeds = taListBuilder.processOneItemsets(oneLists, orderList);
 
-        // 2. Lượt quét thứ 2, xây dựng các TA-List 1 item
-        TAListFactory factory = new TAListFactory(db, promising, order);
-        Map<Integer, TAList> oneLists = factory.TAList1Item();
+        // 3) Mining larger patterns
+        System.out.println("========== MINING LARGER PATTERNS ==========");
+        List<TAList> twoItemsets = patternGenerator.generateTwoItemsets(seeds);
 
-        System.out.println("========== TA-LISTS FOR 1-ITEMS ==========");
-        for (Map.Entry<Integer, TAList> entry : oneLists.entrySet()) {
-            int itemId = entry.getKey();
-            TAList taList = entry.getValue();
-
-            System.out.println("\n--- Item " + itemId + " ---");
-            System.out.println("+---------+----------+----------+--------+");
-            System.out.println("|   TID   |   util   |   sRLU   | nRLUI  |");
-            System.out.println("+---------+----------+----------+--------+");
-
-            for (TAListEntry e : taList.entries) {
-                System.out.printf("| %7d | %8.2f | %8.2f | %6d |%n",
-                        e.tid, e.util, e.sRLU, e.nRLUI);
-            }
-            System.out.println("+---------+----------+----------+--------+");
+        if (!twoItemsets.isEmpty()) {
+            taMiner(twoItemsets, 1);
         }
 
-        // 3) Filter các TA-List 1 item dựa trên MRAU
-        List<TAList> seeds = new ArrayList<>();
-        for (int item : orderList) {
-            TAList L = oneLists.get(item);
-            if (L == null)
-                continue;
-            double mrau = mrauCalc.mrauOf(L);
-            if (mrau >= minutil)
-                seeds.add(L);
-        }
+        // Print statistics
+        statistics.printFinalStatistics(cacheManager.size());
+        MemoryMonitor.printMemoryUsage("End");
+    }
 
-        // 4) DFS TA-Miner
-        for (int i = 0; i < seeds.size(); i++) {
-            TAList prefix = seeds.get(i);
-            // output if au >= minutil
-            double au = mrauCalc.auOf(prefix);
-            if (au >= minutil) {
-                haupItemsets.add(prefix.itemset);
-                haupAU.add(au);
+    // In cấu hình
+    private void printMiningConfig() {
+        System.out.println("minutil: " + minutil);
+        System.out.println("Max cache size: " + MAX_CACHE_SIZE);
+        System.out.println("Max depth: " + MAX_DEPTH);
+        System.out.println("Max HAUPs: " + MAX_HAUPS);
+    }
+
+    /**
+     * Recursive mining method
+     */
+    private void taMiner(List<TAList> patterns, int currentPrefixLen) {
+        // Check và áp dụng limits
+        if (!checkDepthLimit(patterns))
+            return;
+        patterns = applyPatternsLimit(patterns);
+
+        for (int i = 0; i < patterns.size(); i++) {
+            TAList pattern = patterns.get(i);
+            statistics.incrementPatternsChecked();
+
+            // Print progress
+            statistics.printProgress(
+                    statistics.getCurrentDepth(),
+                    haupChecker.getHAUPCount(),
+                    cacheManager.size());
+
+            // Check HAUP
+            double au = mrauCalc.auOf(pattern);
+            if (haupChecker.checkAndAdd(pattern.itemset, au)) {
+                statistics.incrementHAUPsFound();
             }
-            // extend with following seeds by order
-            List<TAList> suffixes = new ArrayList<>();
-            for (int j = i + 1; j < seeds.size(); j++) {
-                TAList next = seeds.get(j);
-                TAList joined = joiner.join(prefix, next, 0);
-                double mrau = mrauCalc.mrauOf(joined);
-                if (mrau >= minutil)
-                    suffixes.add(joined);
-                // else pruned
+
+            // Generate extensions
+            double mrau = mrauCalc.mrauOf(pattern);
+            if (mrau >= minutil) {
+                List<TAList> extensions = patternGenerator.generateExtensions(patterns, i, currentPrefixLen);
+                if (!extensions.isEmpty()) {
+                    taMiner(extensions, pattern.len);
+                }
             }
-            // recursive mining
-            taMiner(prefix, suffixes);
         }
     }
 
-    private void taMiner(TAList prefix, List<TAList> exts) {
-        for (int i = 0; i < exts.size(); i++) {
-            TAList P = exts.get(i);
-            double au = mrauCalc.auOf(P);
-            if (au >= minutil) {
-                haupItemsets.add(P.itemset);
-                haupAU.add(au);
-            }
-            // build candidates by joining with following extensions sharing prefix
-            List<TAList> nextLevel = new ArrayList<>();
-            for (int j = i + 1; j < exts.size(); j++) {
-                TAList Q = exts.get(j);
-                // common prefix length = prefix.len
-                TAList R = joiner.join(P, Q, prefix.len);
-                double mrau = mrauCalc.mrauOf(R);
-                if (mrau >= minutil)
-                    nextLevel.add(R);
-            }
-            if (!nextLevel.isEmpty())
-                taMiner(P, nextLevel);
+    /**
+     * Kiểm tra depth limit
+     */
+    private boolean checkDepthLimit(List<TAList> patterns) {
+        int currentDepth = patterns.isEmpty() ? 0 : patterns.get(0).len;
+        statistics.setCurrentDepth(currentDepth);
+
+        if (currentDepth > MAX_DEPTH) {
+            System.out.println("⚠ Reached max depth limit: " + MAX_DEPTH);
+            return false;
         }
+        return true;
+    }
+
+    /**
+     * Áp dụng giới hạn số lượng patterns mỗi level
+     */
+    private List<TAList> applyPatternsLimit(List<TAList> patterns) {
+        if (patterns.size() > MAX_PATTERNS_PER_LEVEL) {
+            System.out.printf("⚠ Too many patterns at depth %d (%d > %d), limiting...%n",
+                    statistics.getCurrentDepth(), patterns.size(), MAX_PATTERNS_PER_LEVEL);
+            return patterns.subList(0, MAX_PATTERNS_PER_LEVEL);
+        }
+        return patterns;
     }
 }

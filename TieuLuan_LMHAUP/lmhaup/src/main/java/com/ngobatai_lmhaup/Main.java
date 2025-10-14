@@ -10,7 +10,6 @@ import com.ngobatai_lmhaup.model.UtilityDatabase;
 
 public class Main {
 	public static void main(String[] args) {
-		// Example: build a small DB
 		UtilityDatabase db = new UtilityDatabase();
 
 		// Định nghĩa theo table-2 (name, profit)
@@ -21,7 +20,7 @@ public class Main {
 		db.addItemDef(new Item(5, 8.0)); // e
 		db.addItemDef(new Item(6, 3.0)); // f
 
-		// Add transactions with quantities -> internal utilities
+		// Thêm các transaction
 		// Transaction 1: {b:1, c:3, d:1, e:1}
 		db.addTransaction(new Transaction(1, Arrays.asList(
 				new TransactionItem(2, 1, db),
@@ -69,16 +68,30 @@ public class Main {
 				new TransactionItem(5, 1, db),
 				new TransactionItem(6, 2, db))));
 
-		System.out.println("Item profit table" + "\n" + db.items);
 		double delta = 0.17;
 		LmhaupMiner miner = new LmhaupMiner(db, delta);
 		miner.mine();
 
-		// Print results
-		for (int k = 0; k < miner.haupItemsets.size(); k++) {
-			int[] is = miner.haupItemsets.get(k);
-			double au = miner.haupAU.get(k);
-			System.out.println(Arrays.toString(is) + " AU=" + au);
+		if (miner.haupItemsets.isEmpty()) {
+			System.out.println("Không tìm thấy pattern nào thỏa mãn ngưỡng minutil.");
+		} else {
+			System.out.println("\nDanh sách các High Average Utility Pattern:\n");
+			System.out.println("+-----------+------------------+");
+			System.out.println("| Pattern | Average Utility |");
+			System.out.println("+-----------+------------------+");
+
+			for (int k = 0; k < miner.haupItemsets.size(); k++) {
+				int[] itemset = miner.haupItemsets.get(k);
+				double au = miner.haupAU.get(k);
+
+				// Chuyển đổi itemset thành chuỗi đẹp
+				String patternStr = Arrays.toString(itemset);
+				System.out.printf("| %-9s | %16.4f |%n", patternStr, au);
+			}
+
+			System.out.println("+-----------+------------------+");
 		}
+
+		System.out.println("\n================================================================");
 	}
 }
