@@ -15,6 +15,9 @@ public class UtilityDatabase {
     // Dùng để tính u(i,T)
     public final Map<Integer, Item> items = new HashMap<>();
 
+    // Map từ item name (String) sang item ID (int) để dễ tra cứu
+    public final Map<String, Integer> nameToId = new HashMap<>();
+
     // ======================Thứ tự toàn cục=============================
     // lưu ánh xạ từ mã mục sang hạng trong thứ tự hỗ trợ tăng dần để đảm bảo chỉ
     // nối với các mục “đứng sau” tiền tố
@@ -33,6 +36,7 @@ public class UtilityDatabase {
     // Thêm vào item profit table - def1
     public void addItemDef(Item it) {
         items.put(it.id, it);
+        nameToId.put(it.name, it.id);
     }
 
     // Thêm giao dịch
@@ -42,5 +46,26 @@ public class UtilityDatabase {
         for (TransactionItem io : t.items) {
             support.merge(io.itemId, 1, Integer::sum);
         }
+    }
+
+    /**
+     * Chuyển itemset (int[]) thành pattern string với tên items
+     * VD: [1,3,5] -> "{a,c,e}"
+     */
+    public String itemsetToString(int[] itemset) {
+        if (itemset == null || itemset.length == 0) {
+            return "{}";
+        }
+
+        StringBuilder sb = new StringBuilder("{");
+        for (int i = 0; i < itemset.length; i++) {
+            Item item = items.get(itemset[i]);
+            sb.append(item != null ? item.name : itemset[i]);
+            if (i < itemset.length - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append("}");
+        return sb.toString();
     }
 }

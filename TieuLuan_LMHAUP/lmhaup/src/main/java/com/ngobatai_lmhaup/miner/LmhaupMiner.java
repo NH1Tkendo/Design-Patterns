@@ -14,7 +14,7 @@ import com.ngobatai_lmhaup.util.MemoryMonitor;
 public class LmhaupMiner {
 
     // Giới hạn kết quả đầu ra
-    private static final int MAX_CACHE_SIZE = 5000;
+    private static final int MAX_CACHE_SIZE = 100000; // Tăng lên 100K để cache tốt hơn
     private static final int MAX_DEPTH = 8;
     private static final int MAX_PATTERNS_PER_LEVEL = 2000;
     private static final int MAX_HAUPS = 10000;
@@ -22,9 +22,13 @@ public class LmhaupMiner {
     // Các thành phần cốt lõi
     private final UtilityDatabase db;
     private final double minutil;
-    private final TMAUBCaculator tmaubCalc = new TMAUBCaculator();
-    private final MRAUCalculator mrauCalc = new MRAUCalculator();
     private final Joiner joiner = new Joiner();
+
+    // TMAUB stats
+    private TMAUBCaculator.TmaubStats tmaubStats;
+
+    // MRAUCalculator for AU calculation
+    private final MRAUCalculator mrauCalc = new MRAUCalculator();
 
     // Các lớp helper
     private final CacheManager cacheManager;
@@ -37,18 +41,18 @@ public class LmhaupMiner {
     public final List<int[]> haupItemsets;
     public final List<Double> haupAU;
 
+    // Constructor với delta (%)
     public LmhaupMiner(UtilityDatabase db, double delta) {
-        // 1. Gán db và minutil
         this.db = db;
         double number = db.totalUtilityDB * delta;
         this.minutil = Math.round(number * 100.0) / 100.0;
 
-        // 2. Khởi tạo các lớp helper
+        // Khởi tạo các lớp helper
         this.cacheManager = new CacheManager(MAX_CACHE_SIZE);
         this.haupChecker = new HAUPChecker(minutil, MAX_HAUPS);
         this.statistics = new MiningStatistics();
         this.orderBuilder = new ItemOrderBuilder(db, minutil);
-        this.patternGenerator = new PatternGenerator(joiner, cacheManager, null); // itemOrder will be set later
+        this.patternGenerator = new PatternGenerator(joiner, cacheManager, null);
 
         joiner.setUtilityCache(cacheManager.getCache());
 
@@ -56,21 +60,17 @@ public class LmhaupMiner {
         this.haupAU = haupChecker.getHAUPAU();
     }
 
+    // Constructor với minutil tuyệt đối
     public LmhaupMiner(UtilityDatabase db, double minutil, boolean isAbsolute) {
         this.db = db;
-        if (isAbsolute) {
-            this.minutil = minutil;
-        } else {
-            double number = db.totalUtilityDB * minutil;
-            this.minutil = Math.round(number * 100.0) / 100.0;
-        }
+        this.minutil = minutil;
 
-        // Khởi tạo lớp helper
+        // Khởi tạo các lớp helper
         this.cacheManager = new CacheManager(MAX_CACHE_SIZE);
-        this.haupChecker = new HAUPChecker(this.minutil, MAX_HAUPS);
+        this.haupChecker = new HAUPChecker(minutil, MAX_HAUPS);
         this.statistics = new MiningStatistics();
-        this.orderBuilder = new ItemOrderBuilder(db, this.minutil);
-        this.patternGenerator = new PatternGenerator(joiner, cacheManager, null); // itemOrder will be set later
+        this.orderBuilder = new ItemOrderBuilder(db, minutil);
+        this.patternGenerator = new PatternGenerator(joiner, cacheManager, null);
 
         joiner.setUtilityCache(cacheManager.getCache());
 
@@ -83,9 +83,10 @@ public class LmhaupMiner {
         MemoryMonitor.printMemoryUsage("Start");
 
         // 1) Tính TMAUB và lọc ra các promising item
-        TMAUBCaculator.TmaubStats st = tmaubCalc.compute(db);
-        Set<Integer> promising = orderBuilder.filterPromisingItems(st);
-        List<Integer> orderList = orderBuilder.buildOrder(st, promising);
+        TMAUBCaculator tmaubCalc = new TMAUBCaculator();
+        tmaubStats = tmaubCalc.compute(db);
+        Set<Integer> promising = orderBuilder.filterPromisingItems(tmaubStats);
+        List<Integer> orderList = orderBuilder.buildOrder(tmaubStats, promising);
 
         // Set item order for pattern generator after it's been built
         patternGenerator.setItemOrder(db.itemOrder);
@@ -143,9 +144,9 @@ public class LmhaupMiner {
                 statistics.incrementHAUPsFound();
             }
 
-            // Generate extensions
-            double mrau = mrauCalc.mrauOf(pattern);
-            if (mrau >= minutil) {
+            // Generate extensions using TMAUB upper bound
+            double tmaub = calculateTMAUB(pattern.itemset);
+            if (tmaub >= minutil) {
                 List<TAList> extensions = patternGenerator.generateExtensions(patterns, i, currentPrefixLen);
                 if (!extensions.isEmpty()) {
                     taMiner(extensions, pattern.len);
@@ -154,9 +155,6 @@ public class LmhaupMiner {
         }
     }
 
-    /**
-     * Kiểm tra depth limit
-     */
     private boolean checkDepthLimit(List<TAList> patterns) {
         int currentDepth = patterns.isEmpty() ? 0 : patterns.get(0).len;
         statistics.setCurrentDepth(currentDepth);
@@ -168,9 +166,6 @@ public class LmhaupMiner {
         return true;
     }
 
-    /**
-     * Áp dụng giới hạn số lượng patterns mỗi level
-     */
     private List<TAList> applyPatternsLimit(List<TAList> patterns) {
         if (patterns.size() > MAX_PATTERNS_PER_LEVEL) {
             System.out.printf("⚠ Too many patterns at depth %d (%d > %d), limiting...%n",
@@ -178,5 +173,16 @@ public class LmhaupMiner {
             return patterns.subList(0, MAX_PATTERNS_PER_LEVEL);
         }
         return patterns;
+    }
+
+    /**
+     * Calculate TMAUB for an itemset by summing TMAUB values of all items
+     */
+    private double calculateTMAUB(int[] itemset) {
+        double tmaub = 0.0;
+        for (int item : itemset) {
+            tmaub += tmaubStats.tmaubPerItem.getOrDefault(item, 0.0);
+        }
+        return tmaub;
     }
 }

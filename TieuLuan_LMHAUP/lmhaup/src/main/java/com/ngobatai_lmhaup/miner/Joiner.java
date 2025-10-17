@@ -99,10 +99,61 @@ public class Joiner {
             return tidUtilMap.get(tid);
         }
 
-        // Nếu không có trong cache, return 0 (không nên xảy ra)
-        System.err.println("WARNING: Prefix utility not found in cache for " +
-                prefixKey + ", TID=" + tid);
-        return 0.0;
+        // Nếu không có trong cache, tính lại từ pattern entries
+        // Đây là fallback case - không nên xảy ra thường xuyên
+        double fallbackUtil = calculatePrefixUtilityFallback(pattern, tid, prefixLen);
+
+        // Cache lại để lần sau không phải tính
+        if (tidUtilMap == null) {
+            tidUtilMap = new HashMap<>();
+            utilityCache.put(prefixKey, tidUtilMap);
+        }
+        tidUtilMap.put(tid, fallbackUtil);
+
+        return fallbackUtil;
+    }
+
+    /**
+     * Fallback: Tính utility của prefix khi không có trong cache
+     * Thuật toán: Tìm lại trong cache các sub-patterns và tính ngược lại
+     */
+    private double calculatePrefixUtilityFallback(TAList pattern, int tid, int prefixLen) {
+        // Nếu prefixLen = 0, return 0
+        if (prefixLen == 0) {
+            return 0.0;
+        }
+
+        // Tạo prefix array
+        int[] prefixArray = new int[prefixLen];
+        System.arraycopy(pattern.itemset, 0, prefixArray, 0, prefixLen);
+
+        // Thử tính từ các 1-itemsets trong prefix
+        double estimatedUtil = 0.0;
+        boolean foundAll = true;
+
+        for (int i = 0; i < prefixLen; i++) {
+            String itemKey = prefixArray[i] + ",";
+            Map<Integer, Double> tidUtilMap = utilityCache.get(itemKey);
+            if (tidUtilMap != null && tidUtilMap.containsKey(tid)) {
+                estimatedUtil += tidUtilMap.get(tid);
+            } else {
+                foundAll = false;
+                break;
+            }
+        }
+
+        if (!foundAll) {
+            // Log warning chỉ cho pattern dài (>= 4 items)
+            if (prefixLen >= 4) {
+                System.err.println("WARNING: Prefix utility not found in cache for " +
+                        itemsetToString(prefixArray) +
+                        " (pattern length: " + pattern.len + ", TID=" + tid + ")");
+            }
+            // Trả về 0 như một ước lượng an toàn
+            return 0.0;
+        }
+
+        return estimatedUtil;
     }
 
     /**

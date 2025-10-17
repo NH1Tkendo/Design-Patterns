@@ -20,23 +20,28 @@ public class CacheManager {
     }
 
     /**
-     * Cache utility của một pattern
+     * Cache utility của một pattern với chiến lược thông minh
      */
     public void cachePatternUtility(TAList pattern) {
-        // Kiểm tra kích thước cache
+        // Ưu tiên cache patterns ngắn (prefixes) vì chúng được dùng nhiều
         if (patternUtilCache.size() >= maxCacheSize) {
-            System.out.printf("⚠ Cache size limit reached (%d), clearing cache...%n", maxCacheSize);
-            clearCache();
+            // Nếu cache đầy:
+            // - Patterns rất ngắn (1-3 items): luôn cache
+            // - Patterns trung bình (4-5 items): cache 50%
+            // - Patterns dài (>5 items): không cache
+            if (pattern.len > 5) {
+                return;
+            } else if (pattern.len > 3 && Math.random() > 0.5) {
+                return; // Random skip để giảm áp lực cache
+            }
         }
 
-        // Chỉ cache patterns ngắn (≤ 5 items)
-        if (pattern.len <= 5) {
-            Map<Integer, Double> utilMap = new HashMap<>();
-            for (TAListEntry e : pattern.entries) {
-                utilMap.put(e.tid, e.util);
-            }
-            patternUtilCache.put(itemsetToString(pattern.itemset), utilMap);
+        // Cache pattern
+        Map<Integer, Double> utilMap = new HashMap<>();
+        for (TAListEntry e : pattern.entries) {
+            utilMap.put(e.tid, e.util);
         }
+        patternUtilCache.put(itemsetToString(pattern.itemset), utilMap);
     }
 
     /**

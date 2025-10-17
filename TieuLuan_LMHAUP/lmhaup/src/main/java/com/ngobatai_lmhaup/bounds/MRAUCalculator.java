@@ -4,20 +4,31 @@ import com.ngobatai_lmhaup.struct.TAList;
 import com.ngobatai_lmhaup.struct.TAListEntry;
 
 public class MRAUCalculator {
-    // mrau(P) = sum over T of mrau(P, T) by Definition 11
+
+    // Strategy Selector để chọn strategy phù hợp
+    private final MRAUStrategySelector strategySelector;
+
+    // Constructor mặc định - sử dụng strategy selector
+    public MRAUCalculator() {
+        this.strategySelector = new MRAUStrategySelector();
+    }
+
+    // Constructor cho phép inject custom strategy selector (để test hoặc customize)
+    public MRAUCalculator(MRAUStrategySelector strategySelector) {
+        this.strategySelector = strategySelector;
+    }
+
+    // Tính mrau(P) theo Definition 11
+    // Sử dụng Strategy Pattern để chọn cách tính phù hợp cho từng transaction
     public double mrauOf(TAList list) {
         double s = 0.0;
         int len = list.len;
+
+        // Sử dụng Strategy Pattern thay vì if-else
         for (TAListEntry e : list.entries) {
-            if (e.nRLUI != 0) {
-                // Case 1: nRLUI != 0
-                s += (e.util + e.sRLU) / (len + e.nRLUI);
-            } else if (e.sRLU != 0.0) {
-                // Case 2: nRLUI = 0 but sRLU != 0
-                s += (e.util + e.sRLU) / (len + 1.0);
-            }
-            // Case 3: nRLUI = 0 and sRLU = 0 -> mrau = 0, không cần cộng gì
+            s += strategySelector.computeMRAU(e, len);
         }
+
         return s;
     }
 
